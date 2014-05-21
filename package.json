@@ -1,0 +1,28 @@
+{
+  "name": "glimpse",
+  "version": "0.1.0",
+  "description": "Take glimpseshot of web pages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "snap",
+    "html-snapshot",
+    "gulp-html-snapshot"
+  ],
+  "author": "@antouank",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.6.2",
+    "gulp-mocha": "^0.4.1",
+    "mocha": "^1.18.2",
+    "should": "^3.3.1"
+  },
+  "dependencies": {
+    "fs-extra": "^0.8.1",
+    "path": "^0.4.9",
+    "phantom": "^0.6.1",
+    "q": "^1.0.1"
+  }
+}
