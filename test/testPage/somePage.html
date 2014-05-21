@@ -1,0 +1,169 @@
+<section class="anonymous-referrer internal">
+  <section class="europa-dip alternate-theme"></section>
+
+  <section class="shifty divider-bottom" content-id="shiftyAnonymousReferrer"></section>
+
+  <section class="shouty-mamma divider-bottom bg-white" content-id="shoutyMammaAnonReferrer"></section>
+
+  <section class="nosey-parker">
+
+    <div class="heading inner row">
+      <div class="xlarge-10 xlarge-offset-1 columns">
+        <h2>Anonymize a single link</h2>
+        <p>Create an untraceable link here – or see below for a tool that will make all the links on your website or messageboard untraceable.</p>
+      </div>
+    </div>
+
+    <div class="inner row">
+      <div class="xlarge-10 xlarge-offset-1 columns">
+        <hr class="above">
+      </div>
+    </div>
+
+    <form id="formSingle" name="formSingle" ng-submit="submit()" ng-controller="AnonymousReferrerSingleController" novalidate>
+      <fieldset>
+
+        <div class="message inner row">
+          <div class="medium-8 medium-offset-4 xlarge-7 columns">
+            <div class="error" ng-show="submitted && formSingle.address.$invalid && formSingle.address.$error.validateUrlProtocol">Please make sure your website address begins with http:// or https://</div>
+            <div class="error" ng-show="submitted && formSingle.address.$invalid && !formSingle.address.$error.validateUrlProtocol">Please make sure your website address is correct</div>
+          </div>
+        </div>
+
+        <div class="inner row">
+          <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+            <label for="account" class="left inline">Website address <strong>*</strong></label>
+          </div>
+          <div class="medium-8 xlarge-7 columns end">
+            <input type="url" name="address" ng-model="address" validate-url validate-url-protocol display-invalid required>
+          </div>
+        </div>
+
+        <div class="inner row">
+          <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+            <label for="account" class="left inline">Encode link <strong>*</strong></label>
+          </div>
+          <div class="medium-8 xlarge-7 columns end">
+            <switch id="single-encode" name="encode" ng-model="encode" off-label="'No'" on-label="'Yes'" class="tiny"></switch>
+          </div>
+        </div>
+
+        <div class="submit inner row">
+          <div class="xlarge-10 xlarge-offset-1 columns">
+            <hr>
+          </div>
+          <!-- ng-class and hide-for-small should be based on form's validation state after integrating FormController -->
+          <div class="text-container hide-for-small medium-7 xlarge-6 xlarge-offset-1 columns">
+            Anonymize a <strong>single</strong> link
+          </div>
+          <div class="button-container medium-5 xlarge-4 columns end">
+            <input type="submit" track-click-event="anonymize single link" value="Anonymize" class="button jungle-pool">
+          </div>
+        </div>
+
+        <div class="results" ng-show="showResults" scroll-here="showResults" scroll-here-perc=".5">
+          <div class="inner row">
+            <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+              <label class="left inline">Anonymous link</label>
+            </div>
+            <div class="medium-8 xlarge-7 columns end">
+              <code class="block">{{resultLink}}</code>
+            </div>
+          </div>
+
+          <div class="inner row">
+            <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+              <label class="left inline">Anonymous HTML link</label>
+            </div>
+            <div class="medium-8 xlarge-7 columns end">
+              <code class="block">{{resultHtmlLink}}</code>
+            </div>
+          </div>
+
+          <div class="inner row">
+            <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+              <label class="left inline">Anonymous fourm link</label>
+            </div>
+            <div class="medium-8 xlarge-7 columns end">
+              <code class="block">{{resultForumLink}}</code>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </section>
+
+
+  <section class="nosey-parker">
+
+    <div class="heading inner row">
+      <div class="xlarge-10 xlarge-offset-1 columns">
+        <h2>Anonymize all links from your website</h2>
+        <p>This simple form will generate a small piece of javascript code for your website. Once inserted there, all links from your site will be untraceable.</p>
+      </div>
+    </div>
+
+    <div class="inner row">
+      <div class="xlarge-10 xlarge-offset-1 columns">
+        <hr class="above">
+      </div>
+    </div>
+
+    <form id="formAll" name="formAll" ng-submit="submit()" ng-controller="AnonymousReferrerAllController" novalidate>
+      <fieldset>
+
+        <div class="message inner row">
+          <div class="medium-8 medium-offset-4 xlarge-7 columns">
+            <div class="error" ng-show="submitted && formAll.address.$invalid && formAll.address.$error.validateUrlProtocol">Please make sure your website address begins with http:// or https://</div>
+            <div class="error" ng-show="submitted && formAll.address.$invalid && !formAll.address.$error.validateUrlProtocol">Please make sure your website address is correct</div>
+          </div>
+        </div>
+
+        <div class="inner row">
+          <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+            <label for="account" class="left inline">Website address <strong>*</strong></label>
+          </div>
+          <div class="medium-8 xlarge-7 columns end">
+            <input type="url" name="address" ng-model="address" validate-url validate-url-protocol display-invalid required>
+          </div>
+        </div>
+
+        <div class="inner row">
+          <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+            <label for="account" class="left inline">Encode links <strong>*</strong></label>
+          </div>
+          <div class="medium-8 xlarge-7 columns end">
+            <switch id="all-encode" name="encode" ng-model="encode" off-label="'No'" on-label="'Yes'" class="tiny"></switch>
+          </div>
+        </div>
+
+        <div class="submit inner row">
+          <div class="xlarge-10 xlarge-offset-1 columns">
+            <hr>
+          </div>
+          <!-- ng-class and hide-for-small should be based on form's validation state after integrating FormController -->
+          <div class="text-container hide-for-small medium-7 xlarge-6 xlarge-offset-1 columns">
+            Anonymize <strong>all links</strong> from your website or forum
+          </div>
+          <div class="button-container medium-5 xlarge-4 columns end">
+            <input type="submit" track-click-event="anonymize all links" value="Anonymize" class="button jungle-pool">
+          </div>
+        </div>
+
+        <div class="results" ng-show="showResults" scroll-here="showResults" scroll-here-perc=".5">
+          <div class="inner row">
+            <div class="medium-4 xlarge-3 xlarge-offset-1 columns">
+              <label class="left inline">Javascript code</label>
+            </div>
+            <div class="medium-8 xlarge-7 columns end">
+              <code class="block">{{resultSnippet}}</code>
+              <strong>Important:</strong> Insert this javascript code onto all pages of your website just above the
+              <code>&lt;/body&gt;</code> tag.
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </section>
+  <section class="gob-stopper"></section>
+</section>

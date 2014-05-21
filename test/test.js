@@ -56,7 +56,11 @@ describe('glimpse', function(){
   it('should read the contents of the html page', function(done){
     glimpse({
       folder: __dirname + '/testPage',
-      urls: ['', 'test.html'],
+      urls: [
+        '',
+        'test.html',
+        'somePage.html'
+      ],
       outputDir: 'output',
       verbose: true
     })

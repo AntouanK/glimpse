@@ -2,6 +2,7 @@
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ modules
 var q             = require('q'),
+    fs            = require('fs'),
     fse           = require('fs-extra'),
     phantom       = require('phantom'),
     log           = require('consologger'),
@@ -29,6 +30,10 @@ makeDestPath = function(containerDir){
       log.warning('replacing empty URL with "index.html"!');
     } else {
       fileName = fileName.replace(/.+\//, '');
+
+      if(fileName.match(/\.\w+$/) === null){
+        fileName += '.html'; // by default, add an html extension
+      }
     }
 
     return path.join(containerDir, fileName);
@@ -143,7 +148,10 @@ api.savePage = function(phantomInstance, url, destination) {
           throw err;
         }
 
-        log.info(path.resolve(destination), 'saved');
+        var size = fs.statSync(destination).size;
+        var sizeInKb = (size/1024).toFixed(2);
+
+        log.info(path.resolve(destination), 'saved [ ' + sizeInKb + ' KB ]');
         log.info(Date.now()-start, 'ms ellapsed')
         saveDefer.resolve();
       });
