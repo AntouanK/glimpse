@@ -160,7 +160,7 @@ api.savePage = function(phantomInstance, url, destination) {
 
   }, function (error) {
       // If there's an error or a non-200 status code, log the error.
-      // console.error(error);
+      saveDefer.reject(error);
       phantomInstance.getPhantom().exit();
   }, function (progress) {
       // Log the progress as it comes in.
@@ -170,6 +170,7 @@ api.savePage = function(phantomInstance, url, destination) {
   return saveDefer.promise;
 };
 
+//===================================[ expose ]===================================
 module.exports = function(opt){
 
   if(opt === undefined){
@@ -201,7 +202,7 @@ module.exports = function(opt){
 
   // all checks are done
   //---------------------
-  log.verbose('options', opt);
+  log.verbose('\noptions:\n', opt);
 
   var serverRoot,
       promises = [],
@@ -250,7 +251,7 @@ module.exports = function(opt){
 
   var onNext = function(url){
     
-    var fullUrl = 'http://' + serverRoot + '/' + url,
+    var fullUrl = 'http://' + path.join(serverRoot, url),
       //  make a new deferred
       deferred = q.defer();
 
@@ -261,7 +262,7 @@ module.exports = function(opt){
       });
   };
 
-  var fullUrl = 'http://' + serverRoot + '/' + opt.urls[0],
+  var fullUrl = 'http://' + path.join(serverRoot, opt.urls[0]),
       //  make a new deferred
       deferred = q.defer();
 
