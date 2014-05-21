@@ -43,7 +43,8 @@ var myPhantom = function(){
   var phantomInstance,
       getPhantom,
       phDefer = q.defer(),
-      createPageDefer = q.defer();
+      createPageDefer = q.defer(),
+      pageDeferred = q.defer();
 
   //  instance getter
   getPhantom = function(){
@@ -59,6 +60,18 @@ var myPhantom = function(){
     phDefer.resolve(ph); 
   });
 
+  phDefer.promise
+  .then(function(ph){
+
+    ph.createPage(function(page){
+      pageDeferred.resolve(page);
+    });
+  });
+
+  getPage = function(){
+    return pageDeferred.promise;
+  };
+
   open = function(url){
 
     if(typeof url !== 'string'){
@@ -66,15 +79,14 @@ var myPhantom = function(){
     }
 
     var openDefer = q.defer();
-
-    log.info('Opening ' + url);
   
     phDefer.promise
     //  when phantom instance is ready
     .then(function(ph){
-    
-      ph.createPage(function(page){
-    
+
+      getPage()
+      .then(function(page){
+
         page.open(url, function(status){
 
           openDefer.notify(status);
@@ -101,7 +113,7 @@ var myPhantom = function(){
 };
 
 
-api.savePage = function(url, destination) {
+api.savePage = function(phantomInstance, url, destination) {
 
   if(typeof url !== 'string'){
     throw 'url argument is not a valid string!';
@@ -109,12 +121,12 @@ api.savePage = function(url, destination) {
     throw 'destination argument is not a valid string!';
   }
 
-  var phOne = myPhantom(),
-      saveDefer = q.defer();
+  var saveDefer = q.defer(),
+      start     = Date.now();
 
-  log.info('opening ' + url + ' on Phantom');
+  log.data('getting ' + url);
 
-  phOne
+  phantomInstance
   .open(url)
   .then(function(page){
   
@@ -124,7 +136,6 @@ api.savePage = function(url, destination) {
     },
     function(result) {
 
-      log.info('saving '+url+' to -> '+destination);
       fse.outputFile(destination, result, function(err){
         
         if(err){
@@ -132,19 +143,20 @@ api.savePage = function(url, destination) {
           throw err;
         }
 
-        log.info('file saved');
+        log.info(path.resolve(destination), 'saved');
+        log.info(Date.now()-start, 'ms ellapsed')
         saveDefer.resolve();
       });
-      phOne.getPhantom().exit();
+      // phantomInstance.getPhantom().exit();
     });
 
   }, function (error) {
       // If there's an error or a non-200 status code, log the error.
       // console.error(error);
-      phOne.getPhantom().exit();
+      phantomInstance.getPhantom().exit();
   }, function (progress) {
       // Log the progress as it comes in.
-      log.info("| url: ", url, " | status:", progress);
+      log.info("url: ", url, "| status:", progress);
   });
 
   return saveDefer.promise;
@@ -181,22 +193,30 @@ module.exports = function(opt){
 
   // all checks are done
   //---------------------
-  log.verbose('opt', opt);
+  log.verbose('options', opt);
 
   var serverRoot,
-      promises = [];
+      promises = [],
+      openPagePromise = q.defer(),
+      ph = myPhantom();
 
   //  if folder is given, spin up a server for it
   if(opt.folder !== undefined){
+
     opt.port = opt.port || DEFAULT_PORT;
+    //  start a new static file server
     garcon.start({
       rootPath: opt.folder,
-      port: opt.port
+      port: opt.port,
+      modRewrite: opt.modRewrite  //  define your mod_rewrite rules here
     });
 
+    //  get the root of the new server
     serverRoot = garcon.getRoot();
     if(!serverRoot){
       throw Error('Server was not successfully started');
+    } else {
+      log.data('garcon started a server with root path :', serverRoot);
     }
   }
 
@@ -204,16 +224,51 @@ module.exports = function(opt){
     opt.urls = [opt.urls];
   }
 
-  opt.urls
-  .forEach(function(url){
+  var fetchNext = function(array, cb){
+
+    if(fetchNext.i === undefined){
+      fetchNext.i = 1;
+    } else {
+      fetchNext.i += 1;
+    }
+
+    if(array.length < fetchNext.i+1){
+      return openPagePromise.resolve();
+    }
+
+    //  call cb with the next element
+    cb(array[fetchNext.i]);
+  };
+
+  var onNext = function(url){
+    
+    var fullUrl = 'http://' + serverRoot + '/' + url,
+      //  make a new deferred
+      deferred = q.defer();
+
+      api.savePage(ph, fullUrl, makeDestPath(url))
+      .then(function(){
   
-    var fullUrl = 'http://' + serverRoot + '/' + url;
-    var thisPromise = api.savePage(fullUrl, makeDestPath(url));
-    promises.push(thisPromise);
+        fetchNext(opt.urls, onNext);
+      });
+  };
+
+  var fullUrl = 'http://' + serverRoot + '/' + opt.urls[0],
+      //  make a new deferred
+      deferred = q.defer();
+
+  api.savePage(ph, fullUrl, makeDestPath(opt.urls[0]))
+  .then(function(){
+  
+    fetchNext(opt.urls, onNext);
   });
 
-
-  return q.all(promises);
+  return openPagePromise.promise
+  .then(function(){
+  
+    log.info('closing phantom...');
+    ph.getPhantom().exit();
+  });
 };
 
 })();

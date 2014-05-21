@@ -24,6 +24,7 @@
     "should": "^3.3.1"
   },
   "dependencies": {
+    "connect-modrewrite": "^0.7.5",
     "fs-extra": "^0.8.1",
     "path": "^0.4.9",
     "phantom": "^0.6.1",
