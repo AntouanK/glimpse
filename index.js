@@ -27,7 +27,10 @@ makeDestPath = function(containerDir){
     if(fileName === ''){
       fileName = 'index.html';
       log.warning('replacing empty URL with "index.html"!');
+    } else {
+      fileName = fileName.replace(/.+\//, '');
     }
+
     return path.join(containerDir, fileName);
   };
 };

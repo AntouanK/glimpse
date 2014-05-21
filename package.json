@@ -2,9 +2,13 @@
   "name": "glimpse",
   "version": "0.1.0",
   "description": "Take glimpseshot of web pages",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AntouanK/glimpse.git"
+  },
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/test.js"
   },
   "keywords": [
     "snap",
@@ -12,7 +16,7 @@
     "gulp-html-snapshot"
   ],
   "author": "@antouank",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "gulp": "^3.6.2",
     "gulp-mocha": "^0.4.1",
