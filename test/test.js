@@ -33,28 +33,28 @@ describe('garcon', function(){
   });
 });
 
-describe('html-snapshot', function(){
+describe('glimpse', function(){
 
-  var htmlSnapshot = require('../index');
+  var glimpse = require('../index');
 
   it('should be a function', function(){
-    htmlSnapshot.should.be.an.Function;
+    glimpse.should.be.an.Function;
   });
 
   it('should throw an error, when called without options', function(){
     (function(){
-      htmlSnapshot();
+      glimpse();
     }).should.throw;
   });
 
   it('should throw an error, when called without root path', function(){
     (function(){
-      htmlSnapshot({});
+      glimpse({});
     }).should.throw;
   });
 
   it('should read the contents of the html page', function(done){
-    htmlSnapshot({
+    glimpse({
       folder: __dirname + '/testPage',
       urls: ['', 'test.html'],
       outputDir: 'output',

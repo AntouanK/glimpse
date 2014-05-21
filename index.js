@@ -16,7 +16,7 @@ var q             = require('q'),
     api = {},
     DEFAULT_PORT = 19283;
 
-log.setPrefix(function(){ return '[html-snapshot] '; });
+log.setPrefix(function(){ return '[glimpse] '; });
 
 //  helpers
 makeDestPath = function(containerDir){
