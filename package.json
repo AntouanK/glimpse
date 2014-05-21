@@ -1,7 +1,7 @@
 {
   "name": "glimpse",
-  "version": "0.1.1",
-  "description": "Take glimpseshot of web pages",
+  "version": "0.1.2",
+  "description": "Take snapshot of web pages",
   "repository": {
     "type": "git",
     "url": "https://github.com/AntouanK/glimpse.git"
