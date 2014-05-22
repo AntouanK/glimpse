@@ -118,7 +118,14 @@ var myPhantom = function(){
 };
 
 
-api.savePage = function(phantomInstance, url, destination) {
+api.savePage = function(opt) {
+
+  var phantomInstance = opt.ph,
+      url = opt.url,
+      destination = opt.dest,
+      onPageDone = opt.onPageDone,
+      fnString,
+      evalFn;
 
   if(typeof url !== 'string'){
     throw 'url argument is not a valid string!';
@@ -134,9 +141,20 @@ api.savePage = function(phantomInstance, url, destination) {
   phantomInstance
   .open(url)
   .then(function(page){
+
+    if(onPageDone){
+      page.evaluate(
+        onPageDone,
+        function(result){
+
+          log.verbose('onPageDone:', result);
+        }
+      );
+    }
   
     page.evaluate(
-    function() {
+    function(){
+
       return document.documentElement.outerHTML;
     },
     function(result) {
@@ -255,7 +273,12 @@ module.exports = function(opt){
       //  make a new deferred
       deferred = q.defer();
 
-      api.savePage(ph, fullUrl, makeDestPath(url))
+      api.savePage({
+        ph: ph,
+        url: fullUrl,
+        dest: makeDestPath(url),
+        onPageDone: opt.onPageDone
+      })
       .then(function(){
   
         fetchNext(opt.urls, onNext);
@@ -266,7 +289,12 @@ module.exports = function(opt){
       //  make a new deferred
       deferred = q.defer();
 
-  api.savePage(ph, fullUrl, makeDestPath(opt.urls[0]))
+  api.savePage({
+    ph: ph,
+    url: fullUrl,
+    dest: makeDestPath(opt.urls[0]),
+    onPageDone: opt.onPageDone
+  })
   .then(function(){
   
     fetchNext(opt.urls, onNext);

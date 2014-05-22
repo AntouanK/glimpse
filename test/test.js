@@ -54,6 +54,19 @@ describe('glimpse', function(){
   });
 
   it('should read the contents of the html page', function(done){
+
+    var onPageDone = function(){
+
+      var linkEle = document.querySelector('link'),
+          linkRemoved = false;
+      if(linkEle !== null){
+        linkRemoved = true;
+        linkEle.parentElement.removeChild(linkEle)
+      }
+
+      return linkRemoved;
+    };
+
     glimpse({
       folder: __dirname + '/testPage',
       urls: [
@@ -62,6 +75,7 @@ describe('glimpse', function(){
         'somePage.html'
       ],
       outputDir: 'output',
+      onPageDone: onPageDone,
       verbose: true
     })
     .then(function(a){
