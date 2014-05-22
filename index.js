@@ -43,7 +43,7 @@ makeDestPath = function(containerDir){
 //  create a phantom instance
 //  expose an `open` property with a function that retrieves a page
 //  expose a `phantom` property with the phantom instance
-var myPhantom = function(){
+var myPhantom = function(opt){
 
   var phantomInstance,
       getPhantom,
@@ -91,6 +91,23 @@ var myPhantom = function(){
 
       getPage()
       .then(function(page){
+
+        //  reject external sources optionally
+        if(opt.rejectExternalSources){
+          page.onResourceRequested(
+            function(requestData, request) {
+              if(requestData.url.match(/http:\/\/localhost/) === null){
+                request.abort();
+              }
+            },
+            function(requestData) {
+              if(requestData.url.match(/http:\/\/localhost/) === null){
+                //  log the aborted request
+                log.error('aborted -> ',requestData.url);
+              }
+            }
+          );
+        }
 
         page.open(url, function(status){
 
@@ -224,7 +241,7 @@ module.exports = function(opt){
   var serverRoot,
       promises = [],
       openPagePromise = q.defer(),
-      ph = myPhantom();
+      ph = myPhantom(opt);
 
   //  if folder is given, spin up a server for it
   if(opt.folder !== undefined){
@@ -292,10 +309,7 @@ module.exports = function(opt){
         fetchNext(opt.urls, onNext);
       })
       .fail(function(err){   //  TODO : do something else on error?
-
-        log.error(err);
         openPagePromise.reject();
-        //fetchNext(opt.urls, onNext);
       });
   };
 
@@ -318,12 +332,16 @@ module.exports = function(opt){
 
   return openPagePromise.promise
   .then(function(){
-
     log.info('closing phantom...');
     ph.getPhantom().exit();
+    log.setPrefix(function(){ return ''; });
+  })
+  .fail(function(err){
+    log.error(err);
+    log.info('closing phantom...');
+    ph.getPhantom().exit();
+    log.setPrefix(function(){ return ''; });
   });
-
-  log.setPrefix(function(){ return ''; });
 };
 
 })();
