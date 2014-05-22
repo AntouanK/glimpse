@@ -177,7 +177,6 @@ api.savePage = function(opt) {
     });
 
   }, function (error) {
-      // If there's an error or a non-200 status code, log the error.
       saveDefer.reject(error);
       phantomInstance.getPhantom().exit();
   }, function (progress) {
@@ -267,25 +266,39 @@ module.exports = function(opt){
     cb(array[fetchNext.i]);
   };
 
-  var onNext = function(url){
+  var getFullUrl = function(relative){
+  
+    if(opt.folder){
+      return 'http://' + path.join(serverRoot, relative);
+    } else if(opt.root){
+      return 'http://' + path.join(opt.root, relative)
+    }
+  };
+
+  var onNext = function(relativeUrl){
     
-    var fullUrl = 'http://' + path.join(serverRoot, url),
-      //  make a new deferred
-      deferred = q.defer();
+    var fullUrl = getFullUrl(relativeUrl),
+        //  make a new deferred
+        deferred = q.defer();
 
       api.savePage({
         ph: ph,
         url: fullUrl,
-        dest: makeDestPath(url),
+        dest: makeDestPath(relativeUrl),
         onPageDone: opt.onPageDone
       })
       .then(function(){
   
         fetchNext(opt.urls, onNext);
+      },
+      function(err){   //  TODO : do something else on error?
+
+        log.error(err);
+        fetchNext(opt.urls, onNext);
       });
   };
 
-  var fullUrl = 'http://' + path.join(serverRoot, opt.urls[0]),
+  var fullUrl = getFullUrl(opt.urls[0]),
       //  make a new deferred
       deferred = q.defer();
 
