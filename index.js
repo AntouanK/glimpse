@@ -24,7 +24,7 @@ makeDestPath = function(containerDir){
 
   //  TODO : add check for dir here
   makeDestPath = function(fileName){
-  
+
     if(fileName === ''){
       fileName = 'index.html';
       log.warning('replacing empty URL with "index.html"!');
@@ -42,7 +42,7 @@ makeDestPath = function(containerDir){
 
 //  create a phantom instance
 //  expose an `open` property with a function that retrieves a page
-//  expose a `phantom` property with the phantom instance 
+//  expose a `phantom` property with the phantom instance
 var myPhantom = function(){
 
   var phantomInstance,
@@ -53,7 +53,7 @@ var myPhantom = function(){
 
   //  instance getter
   getPhantom = function(){
-  
+
     return phantomInstance;
   };
 
@@ -62,7 +62,7 @@ var myPhantom = function(){
     //  when ready,save the reference
     phantomInstance = ph;
     //  and resolve the promise
-    phDefer.resolve(ph); 
+    phDefer.resolve(ph);
   });
 
   phDefer.promise
@@ -84,7 +84,7 @@ var myPhantom = function(){
     }
 
     var openDefer = q.defer();
-  
+
     phDefer.promise
     //  when phantom instance is ready
     .then(function(ph){
@@ -151,7 +151,7 @@ api.savePage = function(opt) {
         }
       );
     }
-  
+
     page.evaluate(
     function(){
 
@@ -160,7 +160,7 @@ api.savePage = function(opt) {
     function(result) {
 
       fse.outputFile(destination, result, function(err){
-        
+
         if(err){
           saveDefer.reject(err);
           throw err;
@@ -267,7 +267,7 @@ module.exports = function(opt){
   };
 
   var getFullUrl = function(relative){
-  
+
     if(opt.folder){
       return 'http://' + path.join(serverRoot, relative);
     } else if(opt.root){
@@ -276,7 +276,7 @@ module.exports = function(opt){
   };
 
   var onNext = function(relativeUrl){
-    
+
     var fullUrl = getFullUrl(relativeUrl),
         //  make a new deferred
         deferred = q.defer();
@@ -288,13 +288,14 @@ module.exports = function(opt){
         onPageDone: opt.onPageDone
       })
       .then(function(){
-  
+
         fetchNext(opt.urls, onNext);
-      },
-      function(err){   //  TODO : do something else on error?
+      })
+      .fail(function(err){   //  TODO : do something else on error?
 
         log.error(err);
-        fetchNext(opt.urls, onNext);
+        openPagePromise.reject();
+        //fetchNext(opt.urls, onNext);
       });
   };
 
@@ -309,16 +310,20 @@ module.exports = function(opt){
     onPageDone: opt.onPageDone
   })
   .then(function(){
-  
     fetchNext(opt.urls, onNext);
+  })
+  .fail(function(){
+    openPagePromise.reject();
   });
 
   return openPagePromise.promise
   .then(function(){
-  
+
     log.info('closing phantom...');
     ph.getPhantom().exit();
   });
+
+  log.setPrefix(function(){ return ''; });
 };
 
 })();
